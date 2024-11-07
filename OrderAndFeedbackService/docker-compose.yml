@@ -1,0 +1,6 @@
+﻿services:
+  orderandfeedbackservice:
+    image: orderandfeedbackservice
+    build:
+      context: .
+      dockerfile: OrderAndFeedbackService/Dockerfile

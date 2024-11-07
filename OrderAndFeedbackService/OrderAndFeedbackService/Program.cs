@@ -1,4 +1,4 @@
-namespace OrderAndFeedback;
+namespace OrderAndFeedbackService;
 
 public class Program
 {
