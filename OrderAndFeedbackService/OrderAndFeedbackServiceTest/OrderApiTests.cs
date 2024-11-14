@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OrderAndFeedbackService;
@@ -66,27 +67,19 @@ public class OrderApiTests : IAsyncLifetime
     }
     
     [Fact]
-    public void ShouldCreateOrder()
+    public async Task ShouldCreateOrder()
     {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlServer(_msSqlContainer.GetConnectionString())
-            .Options;
+        var orderLineDto1 = new OrderLineDTO(0, 1, 2, 3);
+        var orderLineDto2 = new OrderLineDTO(0, 1, 2, 3);
+        var orderLines = new List<OrderLineDTO> {orderLineDto1, orderLineDto2};
 
-        using (var context = new ApplicationDbContext(options))
-        {
-            OrderFacade orderFacade = new OrderFacade(context);
-            OrderLineDTO orderLineDto1 = new OrderLineDTO(0, 1, 2, 3);
-            OrderLineDTO orderLineDto2 = new OrderLineDTO(0, 1, 2, 3);
-            List<OrderLineDTO> orderLines = new List<OrderLineDTO>();
-            orderLines.Add(orderLineDto1);
-            orderLines.Add(orderLineDto2);
+        var orderDto = new OrderDTO(0, 1, 2, 3, orderLines, 1, 1000, "Payed", "receipt");
 
-            OrderDTO orderDto = new OrderDTO(0, 1, 2, 3, orderLines, 1, 1000, "Payed", "receipt");
+        var response = await _client.PostAsJsonAsync("/api/OrderApi", orderDto);
+        response.EnsureSuccessStatusCode();
 
-            Order order = orderFacade.CreateOrder(orderDto);
-
-            Assert.NotNull(order);
-            Assert.Equal(orderDto.OrderNumber, order.OrderNumber);
-        }
+        var result = await response.Content.ReadAsStringAsync();
+        Assert.Equal("Order created successfully", result);
+        
     }
 }
