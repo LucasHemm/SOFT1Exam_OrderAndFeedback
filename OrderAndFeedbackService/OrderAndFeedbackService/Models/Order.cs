@@ -5,7 +5,7 @@ namespace OrderAndFeedbackService.Models;
 public class Order
 {
     public int Id { get; set; }
-    public int OrderNumber { get; set; }
+    public string OrderNumber { get; set; }
     public int CustomerId { get; set; }
     public int AgentId { get; set; }
     public int RestaurantId{ get; set; }
@@ -19,7 +19,7 @@ public class Order
     {
     }
 
-    public Order(int id, int orderNumber, int customerId, int agentId, int restaurantId, List<OrderLine> orderLines, int paymentId, int totalPrice, string status, string receipt)
+    public Order(int id, string orderNumber, int customerId, int agentId, int restaurantId, List<OrderLine> orderLines, int paymentId, int totalPrice, string status, string receipt)
     {
         Id = id;
         OrderNumber = orderNumber;
@@ -32,20 +32,11 @@ public class Order
         Status = status;
         Receipt = receipt;
     }
-
-    public Order(int orderNumber, int customerId, int agentId, int restaurantId, string status)
-    {
-        OrderNumber = orderNumber;
-        CustomerId = customerId;
-        AgentId = agentId;
-        RestaurantId = restaurantId;
-        Status = status;
-    }
-
+    
     public Order(OrderDTO orderDto)
     {
         Id = orderDto.Id;
-        OrderNumber = orderDto.OrderNumber;
+        OrderNumber = orderDto.OrderNumber ?? orderDto.Id.ToString();
         CustomerId = orderDto.CustomerId;
         AgentId = orderDto.AgentId;
         RestaurantId = orderDto.RestaurantId;
