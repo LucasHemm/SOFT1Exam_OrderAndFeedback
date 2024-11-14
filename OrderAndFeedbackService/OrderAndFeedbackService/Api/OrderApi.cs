@@ -51,7 +51,7 @@ public class OrderApi : ControllerBase
     {
         try
         {
-            return Ok(_orderFacade.GetOrder(id));
+            return Ok(new OrderDTO(_orderFacade.GetOrder(id)));
         }
         catch (Exception ex)
         {

@@ -80,9 +80,9 @@ public class OrderApiTests : IAsyncLifetime
         var result = await response.Content.ReadAsStringAsync();
         Assert.Equal("Order created successfully", result);
     }
-    
+
     [Fact]
-    public async Task ShouldUpdateOrderStatus()
+    public async Task ShouldGetOrderById()
     {
         var orderLines = new List<OrderLineDTO>
         {
@@ -94,18 +94,38 @@ public class OrderApiTests : IAsyncLifetime
 
         var response = await _client.PostAsJsonAsync("/api/OrderApi", orderDto);
         response.EnsureSuccessStatusCode();
-
-        var createdOrder = await response.Content.ReadFromJsonAsync<Order>();
+        
+        var createdOrder = await _client.GetFromJsonAsync<Order>($"/api/OrderApi/1");
+        
+        Assert.NotNull(createdOrder);
+        Assert.Equal(1, createdOrder.Id);
+        
+    }
+    
+    [Fact]
+    public async Task ShouldUpdateOrderStatus()
+    {
+        var orderLines = new List<OrderLineDTO>
+        {
+            new OrderLineDTO(0, 1, 2, 3),
+            new OrderLineDTO(0, 1, 2, 3)
+        };
+    
+        var orderDto = new OrderDTO(0, 1, 2, 3, orderLines, 1, 1000, "Payed", "receipt");
+    
+        var response = await _client.PostAsJsonAsync("/api/OrderApi", orderDto);
+       
+        var createdOrder = await _client.GetFromJsonAsync<Order>($"/api/OrderApi/1");
         Assert.NotNull(createdOrder);
         Assert.Equal("Payed", createdOrder.Status);
-
-        var updateStatusDto = new UpdateStatusDTO(createdOrder.OrderNumber,"Delivered")
+    
+        var updateStatusDto = new UpdateStatusDTO(createdOrder.Id, "Delivered");
         
-
+    
         var updateResponse = await _client.PutAsJsonAsync("/api/OrderApi", updateStatusDto);
         updateResponse.EnsureSuccessStatusCode();
         
-        var updatedOrder = await _client.GetFromJsonAsync<Order>($"/api/OrderApi/{createdOrder.OrderNumber}");
+        var updatedOrder = await _client.GetFromJsonAsync<Order>($"/api/OrderApi/1");
         Assert.NotNull(updatedOrder);
         Assert.Equal("Delivered", updatedOrder.Status);
     }
