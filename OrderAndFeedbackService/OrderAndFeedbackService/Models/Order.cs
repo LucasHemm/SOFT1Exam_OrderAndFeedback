@@ -1,4 +1,6 @@
-﻿namespace OrderAndFeedbackService.Models;
+﻿using OrderAndFeedbackService.DTOs;
+
+namespace OrderAndFeedbackService.Models;
 
 public class Order
 {
@@ -12,4 +14,48 @@ public class Order
     public int TotalPrice { get; set; }
     public String Status { get; set; }
     public String Receipt { get; set; }
+
+    public Order()
+    {
+    }
+
+    public Order(int id, int orderNumber, int customerId, int agentId, int restaurantId, List<OrderLine> orderLines, int paymentId, int totalPrice, string status, string receipt)
+    {
+        Id = id;
+        OrderNumber = orderNumber;
+        CustomerId = customerId;
+        AgentId = agentId;
+        RestaurantId = restaurantId;
+        OrderLines = orderLines;
+        PaymentId = paymentId;
+        TotalPrice = totalPrice;
+        Status = status;
+        Receipt = receipt;
+    }
+
+    public Order(int orderNumber, int customerId, int agentId, int restaurantId, string status)
+    {
+        OrderNumber = orderNumber;
+        CustomerId = customerId;
+        AgentId = agentId;
+        RestaurantId = restaurantId;
+        Status = status;
+    }
+
+    public Order(OrderDTO orderDto)
+    {
+        Id = orderDto.Id;
+        OrderNumber = orderDto.OrderNumber;
+        CustomerId = orderDto.CustomerId;
+        AgentId = orderDto.AgentId;
+        RestaurantId = orderDto.RestaurantId;
+        OrderLines = orderDto.OrderLinesDTOs
+            .Select(orderLineDto => new OrderLine(orderLineDto, this))
+            .ToList();
+        PaymentId = orderDto.PaymentId;
+        TotalPrice = orderDto.TotalPrice;
+        Status = orderDto.Status;
+        Receipt = orderDto.Receipt;
+    }
+
 }
