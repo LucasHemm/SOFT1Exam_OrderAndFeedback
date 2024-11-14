@@ -42,6 +42,12 @@ public class OrderFacade
         return order;
     }
 
+    public List<Order> GetAllOrders()
+    {
+        return _context.Orders
+            .Include(order => order.OrderLines)
+            .ToList();
+    }
 
     public string CreateOrderNumber(int agentId, int restaurantId, int userId)
     {

@@ -122,4 +122,32 @@ public class IntegrationTests : IAsyncLifetime
             Assert.Equal(createdOrder.Id, order.Id);
         }
     }
+    
+    [Fact]
+    public void ShouldGetAllOrders()
+    {
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseSqlServer(_connectionString)
+            .Options;
+
+        using (var context = new ApplicationDbContext(options))
+        {
+            OrderFacade orderFacade = new OrderFacade(context);
+            OrderLineDTO orderLineDto1 = new OrderLineDTO(0, 1, 2, 3);
+            OrderLineDTO orderLineDto2 = new OrderLineDTO(0, 1, 2, 3);
+            List<OrderLineDTO> orderLines = new List<OrderLineDTO>();
+            orderLines.Add(orderLineDto1);
+            orderLines.Add(orderLineDto2);
+
+            OrderDTO orderDto = new OrderDTO(0, 1, 2, 3, orderLines, 1, 1000, "Payed", "receipt");
+
+            Order order = orderFacade.CreateOrder(orderDto);
+            List<Order> orders = orderFacade.GetAllOrders();
+            
+            Assert.NotNull(order);
+            Assert.NotNull(orders);
+            Assert.NotEmpty(orders);
+            Assert.Contains(order, orders);
+        }
+    }
 }

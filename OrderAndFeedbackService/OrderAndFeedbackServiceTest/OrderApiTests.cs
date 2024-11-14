@@ -129,4 +129,24 @@ public class OrderApiTests : IAsyncLifetime
         Assert.NotNull(updatedOrder);
         Assert.Equal("Delivered", updatedOrder.Status);
     }
+    
+    [Fact]
+    public async Task ShouldGetAllOrders()
+    {
+        var orderLines = new List<OrderLineDTO>
+        {
+            new OrderLineDTO(0, 1, 2, 3),
+            new OrderLineDTO(0, 1, 2, 3)
+        };
+
+        var orderDto = new OrderDTO(0, 1, 2, 3, orderLines, 1, 1000, "Payed", "receipt");
+
+        var response = await _client.PostAsJsonAsync("/api/OrderApi", orderDto);
+        response.EnsureSuccessStatusCode();
+        
+        var allOrders = await _client.GetFromJsonAsync<List<Order>>("/api/OrderApi");
+        
+        Assert.NotNull(allOrders);
+        Assert.NotEmpty(allOrders);
+    }
 }
