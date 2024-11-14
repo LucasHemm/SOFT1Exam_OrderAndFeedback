@@ -59,5 +59,19 @@ public class OrderApi : ControllerBase
         }
     }
     
+    // GET: api/Order
+    [HttpGet]
+    public IActionResult GetAllOrders()
+    {
+        try
+        {
+            return Ok(_orderFacade.GetAllOrders().Select(order => new OrderDTO(order)).ToList());
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
     
 }
