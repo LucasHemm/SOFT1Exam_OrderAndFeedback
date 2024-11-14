@@ -30,5 +30,34 @@ public class OrderApi : ControllerBase
         }
     }
     
+    // PUT: api/Order
+    [HttpPut]
+    public IActionResult UpdateOrderStatus([FromBody] UpdateStatusDTO orderDto)
+    {
+        try
+        {
+            _orderFacade.UpdateOrderStatus(orderDto);
+            return Ok("Order status updated successfully");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    // GET: api/Order/{id}
+    [HttpGet("{id}")]
+    public IActionResult GetOrder(int id)
+    {
+        try
+        {
+            return Ok(_orderFacade.GetOrder(id));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
     
 }

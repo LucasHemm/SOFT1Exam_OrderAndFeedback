@@ -19,8 +19,8 @@ public class OrderApiTests : IAsyncLifetime
     public OrderApiTests()
     {
         _msSqlContainer = new MsSqlBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-latest") // Use the correct SQL Server image
-            .WithPassword("YourStrong!Passw0rd") // Set a strong password
+            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+            .WithPassword("YourStrong!Passw0rd")
             .WithCleanUp(true)
             .Build();
 
@@ -29,22 +29,18 @@ public class OrderApiTests : IAsyncLifetime
             {
                 builder.ConfigureServices(services =>
                 {
-                    // Remove the existing ApplicationDbContext registration
                     var descriptor = services.SingleOrDefault(
-                        d => d.ServiceType ==
-                             typeof(DbContextOptions<ApplicationDbContext>));
+                        d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
                     if (descriptor != null)
                     {
                         services.Remove(descriptor);
                     }
 
-                    // Add ApplicationDbContext using the test container's connection string
                     services.AddDbContext<ApplicationDbContext>(options =>
                     {
                         options.UseSqlServer(_msSqlContainer.GetConnectionString());
                     });
 
-                    // Ensure the database is created and migrations are applied
                     var sp = services.BuildServiceProvider();
                     using (var scope = sp.CreateScope())
                     {
@@ -58,6 +54,7 @@ public class OrderApiTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _msSqlContainer.StartAsync();
+        await Task.Delay(500); // Optional delay for container initialization
         _client = _factory.CreateClient();
     }
     
@@ -69,9 +66,11 @@ public class OrderApiTests : IAsyncLifetime
     [Fact]
     public async Task ShouldCreateOrder()
     {
-        var orderLineDto1 = new OrderLineDTO(0, 1, 2, 3);
-        var orderLineDto2 = new OrderLineDTO(0, 1, 2, 3);
-        var orderLines = new List<OrderLineDTO> {orderLineDto1, orderLineDto2};
+        var orderLines = new List<OrderLineDTO>
+        {
+            new OrderLineDTO(0, 1, 2, 3),
+            new OrderLineDTO(0, 1, 2, 3)
+        };
 
         var orderDto = new OrderDTO(0, 1, 2, 3, orderLines, 1, 1000, "Payed", "receipt");
 
@@ -80,6 +79,34 @@ public class OrderApiTests : IAsyncLifetime
 
         var result = await response.Content.ReadAsStringAsync();
         Assert.Equal("Order created successfully", result);
+    }
+    
+    [Fact]
+    public async Task ShouldUpdateOrderStatus()
+    {
+        var orderLines = new List<OrderLineDTO>
+        {
+            new OrderLineDTO(0, 1, 2, 3),
+            new OrderLineDTO(0, 1, 2, 3)
+        };
+
+        var orderDto = new OrderDTO(0, 1, 2, 3, orderLines, 1, 1000, "Payed", "receipt");
+
+        var response = await _client.PostAsJsonAsync("/api/OrderApi", orderDto);
+        response.EnsureSuccessStatusCode();
+
+        var createdOrder = await response.Content.ReadFromJsonAsync<Order>();
+        Assert.NotNull(createdOrder);
+        Assert.Equal("Payed", createdOrder.Status);
+
+        var updateStatusDto = new UpdateStatusDTO(createdOrder.OrderNumber,"Delivered")
         
+
+        var updateResponse = await _client.PutAsJsonAsync("/api/OrderApi", updateStatusDto);
+        updateResponse.EnsureSuccessStatusCode();
+        
+        var updatedOrder = await _client.GetFromJsonAsync<Order>($"/api/OrderApi/{createdOrder.OrderNumber}");
+        Assert.NotNull(updatedOrder);
+        Assert.Equal("Delivered", updatedOrder.Status);
     }
 }

@@ -21,6 +21,26 @@ public class OrderFacade
         _context.SaveChanges();
         return order;
     }
+    
+    public Order GetOrder(int id)
+    {
+        Order order = _context.Orders
+            .Include(order => order.OrderLines)
+            .FirstOrDefault(order => order.Id == id);
+        if (order == null)
+        {
+            throw new Exception("Order not found");
+        }
+        return order;
+    }
+    
+    public Order UpdateOrderStatus(UpdateStatusDTO orderDto)
+    {
+        Order order = GetOrder(orderDto.OrderId);
+        order.Status = orderDto.Status;
+        _context.SaveChanges();
+        return order;
+    }
 
 
     public string CreateOrderNumber(int agentId, int restaurantId, int userId)
