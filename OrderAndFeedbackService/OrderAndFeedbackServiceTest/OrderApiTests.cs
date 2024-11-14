@@ -75,7 +75,7 @@ public class OrderApiTests : IAsyncLifetime
 
         var orderDto = new OrderDTO(0, 1, 2, 3, orderLines, 1, 1000, "Payed", "receipt");
 
-        var response = await _client.PostAsJsonAsync("/api/orders", orderDto);
+        var response = await _client.PostAsJsonAsync("/api/OrderApi", orderDto);
         response.EnsureSuccessStatusCode();
 
         var order = await response.Content.ReadFromJsonAsync<Order>();
