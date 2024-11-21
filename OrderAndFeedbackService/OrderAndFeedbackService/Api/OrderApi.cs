@@ -21,8 +21,8 @@ public class OrderApi : ControllerBase
     {
         try
         {
-            _orderFacade.CreateOrder(orderDto);
-            return Ok("Order created successfully");
+            OrderDTO createdOrder = new OrderDTO(_orderFacade.CreateOrder(orderDto));
+            return Ok(createdOrder);
         }
         catch (Exception ex)
         {
@@ -36,8 +36,8 @@ public class OrderApi : ControllerBase
     {
         try
         {
-            _orderFacade.UpdateOrderStatus(orderDto);
-            return Ok("Order status updated successfully");
+            OrderDTO updateOrderStatus = new OrderDTO(_orderFacade.UpdateOrderStatus(orderDto));
+            return Ok(updateOrderStatus);
         }
         catch (Exception ex)
         {
