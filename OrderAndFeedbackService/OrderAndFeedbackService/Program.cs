@@ -10,17 +10,17 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+// Add services to the container.
         builder.Services.AddControllers();
 
-        // Register DbContext
+// Register DbContext
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-        // Register Facades
+// Register Facades
         builder.Services.AddScoped<OrderFacade>();
 
-        // Enable Swagger/OpenAPI
+// Enable Swagger/OpenAPI
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
@@ -42,7 +42,16 @@ public class Program
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             // Apply any pending migrations and create the database if it doesn't exist
-            dbContext.Database.Migrate();
+
+            try
+            {
+                dbContext.Database.Migrate();
+                
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         // Configure the HTTP request pipeline.
@@ -59,7 +68,7 @@ public class Program
         // Use the CORS policy
         app.UseCors("AllowAll");
 
-        app.UseHttpsRedirection();
+        
         app.UseAuthorization();
         app.MapControllers();
 
