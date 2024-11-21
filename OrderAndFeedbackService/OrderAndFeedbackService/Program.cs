@@ -9,19 +9,30 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+        // Add services to the container.
         builder.Services.AddControllers();
 
-// Register DbContext
+        // Register DbContext
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register Facades
+        // Register Facades
         builder.Services.AddScoped<OrderFacade>();
 
-// Enable Swagger/OpenAPI
+        // Enable Swagger/OpenAPI
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        // Configure CORS policy
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
 
         var app = builder.Build();
 
@@ -39,6 +50,9 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1"));
         }
+
+        // Use the CORS policy
+        app.UseCors("AllowAll");
 
         app.UseHttpsRedirection();
         app.UseAuthorization();
