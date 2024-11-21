@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OrderAndFeedbackService.Facades;
+using Prometheus;
 
 namespace OrderAndFeedbackService;
 
@@ -50,6 +51,10 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1"));
         }
+        
+        app.UseRouting();
+        app.UseMetricServer(); // Default /metrics endpoint
+        app.UseHttpMetrics(); // Enable HttpMetrics
 
         // Use the CORS policy
         app.UseCors("AllowAll");
