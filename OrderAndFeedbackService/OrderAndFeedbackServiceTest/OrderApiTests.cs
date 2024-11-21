@@ -77,8 +77,9 @@ public class OrderApiTests : IAsyncLifetime
         var response = await _client.PostAsJsonAsync("/api/OrderApi", orderDto);
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadAsStringAsync();
-        Assert.Equal("Order created successfully", result);
+        var result = await response.Content.ReadFromJsonAsync(typeof(OrderDTO));
+        Assert.NotNull(result);
+        Assert.Equal(orderDto.TotalPrice, ((OrderDTO)result).TotalPrice);
     }
 
     [Fact]
