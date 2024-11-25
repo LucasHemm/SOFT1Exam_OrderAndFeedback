@@ -9,6 +9,27 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      rabbitmq:
+        image: rabbitmq:3.8-management
+        ports:
+          - 5672:5672    # AMQP protocol port
+          - 15672:15672  # Management UI port (optional)
+        options: >-
+          --health-cmd "rabbitmqctl status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+
+    env:
+      RABBITMQ_HOST: localhost
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -24,8 +45,22 @@ jobs:
       - name: Build
         run: dotnet build OrderAndFeedbackService/OrderAndFeedbackService.sln --no-restore --configuration Release
 
+      - name: Wait for RabbitMQ to be ready
+        run: |
+          for i in {1..30}; do
+            nc -z localhost 5672 && echo "RabbitMQ is up" && exit 0
+            echo "Waiting for RabbitMQ..."
+            sleep 2
+          done
+          echo "RabbitMQ did not start in time" && exit 1
+
       - name: Test
         run: dotnet test OrderAndFeedbackService/OrderAndFeedbackService.sln --no-build --configuration Release --verbosity normal
+        env:
+          RabbitMQ__HostName: ${{ env.RABBITMQ_HOST }}
+          RabbitMQ__Port: ${{ env.RABBITMQ_PORT }}
+          RabbitMQ__UserName: ${{ env.RABBITMQ_USERNAME }}
+          RabbitMQ__Password: ${{ env.RABBITMQ_PASSWORD }}
 
       - name: Log in to Docker Hub
         if: success()
