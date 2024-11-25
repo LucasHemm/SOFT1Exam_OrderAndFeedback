@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OrderAndFeedbackService.DTOs;
 using OrderAndFeedbackService.Facades;
 using OrderAndFeedbackService.Models;
+using OrderAndFeedbackService.Services;
 
 namespace OrderAndFeedbackService.Api;
 [ApiController]
@@ -11,11 +14,13 @@ public class OrderApi : ControllerBase
 {
     private readonly OrderFacade _orderFacade;
     private readonly IMessagePublisher _messagePublisher;
+    private  readonly HttpClient _httpClient = new HttpClient();
 
     
-    public OrderApi(OrderFacade orderFacade)
+    public OrderApi(OrderFacade orderFacade, IMessagePublisher messagePublisher)
     {
         _orderFacade = orderFacade;
+        _messagePublisher = messagePublisher;
     }
     
     // POST: api/Order
@@ -35,25 +40,34 @@ public class OrderApi : ControllerBase
     
     // PUT: api/Order
     [HttpPut]
-    public IActionResult UpdateOrderStatus([FromBody] UpdateStatusDTO orderDto)
+    public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateStatusDTO orderDto)
     {
         try
         {
             // Perform your business logic
             OrderDTO updatedOrder = new OrderDTO(_orderFacade.UpdateOrderStatus(orderDto));
             
+            var response = await _httpClient.GetAsync("http://localhost:5042/api/customerapi/" + updatedOrder.CustomerId);
+            // //from the response, get the user email from the json without using any object, just get the email value
+            var json = await response.Content.ReadAsStringAsync();
+            String email = JObject.Parse(json)["email"].ToString();
             
-
-            // Construct the email message
-            var emailMessage = new EmailMessage
-            {
-                ToEmail = updatedOrder
-                Subject = "Your Order Status Has Been Updated",
-                Content = $"Dear {updatedOrder.Customer.Name},\n\nYour order status has been updated to {updatedOrder.Status}.\n\nThank you for shopping with us!"
-            };
-
+            
+            // Construct the email message  
+            EmailMessage emailMessage = new EmailMessage(email, "Your Order Status Has Been Updated", "$\"Dear {customer.Name},\\n\\nYour order status has been updated to {updatedOrderDTO.Status}.\\n\\nThank you for shopping with us!\"");
+            
+            
             // Publish the email message to the RabbitMQ queue
-            _messagePublisher.PublishEmailMessage(emailMessage);
+            try
+            {
+
+                _messagePublisher.PublishEmailMessage(emailMessage);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                
+            }
 
             return Ok(updatedOrder);
         }
