@@ -46,38 +46,45 @@ public class OrderApi : ControllerBase
         {
             // Perform your business logic
             OrderDTO updatedOrder = new OrderDTO(_orderFacade.UpdateOrderStatus(orderDto));
-            
-            var response = await _httpClient.GetAsync("http://localhost:5042/api/customerapi/" + updatedOrder.CustomerId);
-            // //from the response, get the user email from the json without using any object, just get the email value
-            var json = await response.Content.ReadAsStringAsync();
-            String email = JObject.Parse(json)["email"].ToString();
-            String content = "";
-            if (orderDto.Status.Equals("Delivered"))
-            {
-                content = "Dear Customer, Your order status has been updated to " + updatedOrder.Status + ". Please rate your agent through the MTOGO app - MTOGO";
-            }
-            else
-            {
-                content = "Dear Customer, Your order status has been updated to " + updatedOrder.Status + " - MTOGO";
-                
-            }
-            
-            
-            // Construct the email message  
-            EmailMessage emailMessage = new EmailMessage(email, "Your Order Status Has Been Updated", content);
-            
-            
-            // Publish the email message to the RabbitMQ queue
             try
             {
+                var response = await _httpClient.GetAsync("http://localhost:5042/api/customerapi/" + updatedOrder.CustomerId);
+                // //from the response, get the user email from the json without using any object, just get the email value
+                var json = await response.Content.ReadAsStringAsync();
+                String email = JObject.Parse(json)["email"].ToString();
+                String content = "";
+                if (orderDto.Status.Equals("Delivered"))
+                {
+                    content = "Dear Customer, Your order status has been updated to " + updatedOrder.Status + ". Please rate your agent through the MTOGO app - MTOGO";
+                }
+                else
+                {
+                    content = "Dear Customer, Your order status has been updated to " + updatedOrder.Status + " - MTOGO";
+                
+                }
+            
+            
+                // Construct the email message  
+                EmailMessage emailMessage = new EmailMessage(email, "Your Order Status Has Been Updated", content);
+            
+            
+                // Publish the email message to the RabbitMQ queue
+                try
+                {
 
-                _messagePublisher.PublishEmailMessage(emailMessage);
+                    _messagePublisher.PublishEmailMessage(emailMessage);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                
+                }
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
                 
             }
+            
 
             return Ok(updatedOrder);
         }
