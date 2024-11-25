@@ -51,10 +51,20 @@ public class OrderApi : ControllerBase
             // //from the response, get the user email from the json without using any object, just get the email value
             var json = await response.Content.ReadAsStringAsync();
             String email = JObject.Parse(json)["email"].ToString();
+            String content = "";
+            if (orderDto.Status.Equals("Delivered"))
+            {
+                content = "Dear Customer, Your order status has been updated to " + updatedOrder.Status + ". Please rate your agent through the MTOGO app - MTOGO";
+            }
+            else
+            {
+                content = "Dear Customer, Your order status has been updated to " + updatedOrder.Status + " - MTOGO";
+                
+            }
             
             
             // Construct the email message  
-            EmailMessage emailMessage = new EmailMessage(email, "Your Order Status Has Been Updated", "$\"Dear {customer.Name},\\n\\nYour order status has been updated to {updatedOrderDTO.Status}.\\n\\nThank you for shopping with us!\"");
+            EmailMessage emailMessage = new EmailMessage(email, "Your Order Status Has Been Updated", content);
             
             
             // Publish the email message to the RabbitMQ queue
