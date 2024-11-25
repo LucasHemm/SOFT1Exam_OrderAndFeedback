@@ -27,10 +27,10 @@ public class Feedback
         OverAllRating = overAllRating;
     }
     
-    public Feedback(FeedbackDTO feedbackDto)
+    public Feedback(FeedbackDTO feedbackDto, Order order)
     {
         Id = feedbackDto.Id;
-        Order = new Order(feedbackDto.OrderDTO);
+        Order = order;
         Title = feedbackDto.Title;
         Description = feedbackDto.Description;
         Agentrating = feedbackDto.Agentrating;

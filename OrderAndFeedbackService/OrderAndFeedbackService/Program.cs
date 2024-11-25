@@ -19,6 +19,7 @@ public class Program
 
 // Register Facades
         builder.Services.AddScoped<OrderFacade>();
+        builder.Services.AddScoped<FeedbackFacade>();
 
 // Enable Swagger/OpenAPI
         builder.Services.AddEndpointsApiExplorer();
