@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrderAndFeedbackService.Facades;
+using OrderAndFeedbackService.Models;
+using OrderAndFeedbackService.Services;
 using Prometheus;
 
 namespace OrderAndFeedbackService;
@@ -12,6 +14,7 @@ public class Program
 
 // Add services to the container.
         builder.Services.AddControllers();
+        builder.Services.AddSingleton<IMessagePublisher, MessagePublisher>();
 
 // Register DbContext
         builder.Services.AddDbContext<ApplicationDbContext>(options =>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderAndFeedbackService.DTOs;
 using OrderAndFeedbackService.Facades;
+using OrderAndFeedbackService.Models;
 
 namespace OrderAndFeedbackService.Api;
 [ApiController]
@@ -9,6 +10,8 @@ namespace OrderAndFeedbackService.Api;
 public class OrderApi : ControllerBase
 {
     private readonly OrderFacade _orderFacade;
+    private readonly IMessagePublisher _messagePublisher;
+
     
     public OrderApi(OrderFacade orderFacade)
     {
@@ -36,8 +39,23 @@ public class OrderApi : ControllerBase
     {
         try
         {
-            OrderDTO updateOrderStatus = new OrderDTO(_orderFacade.UpdateOrderStatus(orderDto));
-            return Ok(updateOrderStatus);
+            // Perform your business logic
+            OrderDTO updatedOrder = new OrderDTO(_orderFacade.UpdateOrderStatus(orderDto));
+            
+            
+
+            // Construct the email message
+            var emailMessage = new EmailMessage
+            {
+                ToEmail = updatedOrder
+                Subject = "Your Order Status Has Been Updated",
+                Content = $"Dear {updatedOrder.Customer.Name},\n\nYour order status has been updated to {updatedOrder.Status}.\n\nThank you for shopping with us!"
+            };
+
+            // Publish the email message to the RabbitMQ queue
+            _messagePublisher.PublishEmailMessage(emailMessage);
+
+            return Ok(updatedOrder);
         }
         catch (Exception ex)
         {
