@@ -54,4 +54,39 @@ public class OrderFacade
         return DateTime.Now.ToString("yyyyMMddHHmmss")+new Random().Next(1000,9999)+"a"+agentId+"r"+restaurantId+"u"+userId;
     }
     
+    
+    public List<Order> GetOrdersByStatus(string status)
+    {
+        try
+        {
+            return _context.Orders
+                .Include(order => order.OrderLines)
+                .Where(order => order.Status.ToLower().Equals(status))
+                .ToList();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        
+    }
+    
+    public Order UpdatePaymentAndAgentIds(UpdateOrderIdsDTO dto)
+    {
+        Order order = GetOrder(dto.orderID);
+        order.PaymentId = dto.paymentID;
+        order.AgentId = dto.agentID;
+        _context.SaveChanges();
+        return order;
+    }
+    
+    public List<Order> GetOrdersByAgentId(int agentId)
+    {
+        return _context.Orders
+            .Include(order => order.OrderLines)
+            .Where(order => order.AgentId == agentId && order.Status.ToLower().Equals("accepted"))
+            .ToList();
+    }
+    
 }

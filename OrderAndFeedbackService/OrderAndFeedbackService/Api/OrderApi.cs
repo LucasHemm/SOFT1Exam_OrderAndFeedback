@@ -23,6 +23,7 @@ public class OrderApi : ControllerBase
         _messagePublisher = messagePublisher;
     }
     
+    
     // POST: api/Order
     [HttpPost]
     public IActionResult CreateOrder([FromBody] OrderDTO orderDto)
@@ -122,5 +123,47 @@ public class OrderApi : ControllerBase
         }
     }
     
+    //GET api/Order/status/{status}
+    [HttpGet("status/{status}")]
+    public IActionResult GetOrdersByStatus(string status)
+    {
+        Console.WriteLine(status+" statusapi");
+        try
+        {
+            return Ok(_orderFacade.GetOrdersByStatus(status).Select(order => new OrderDTO(order)).ToList());
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [HttpPut("UpdateIds")]
+    public IActionResult UpdateOrderWithAgentAndPayment([FromBody] UpdateOrderIdsDTO dto )
+    {
+        try
+        {
+            OrderDTO updatedOrder = new OrderDTO(_orderFacade.UpdatePaymentAndAgentIds(dto));
+            return Ok(updatedOrder);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    //GET api/Order/agent/{agentId}
+    [HttpGet("agent/{agentId}")]
+    public IActionResult GetOrdersByAgent(int agentId)
+    {
+        try
+        {
+            return Ok(_orderFacade.GetOrdersByAgentId(agentId).Select(order => new OrderDTO(order)).ToList());
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
     
 }
