@@ -29,7 +29,6 @@ public class FeedbackFacade
         {
             return _context.Feedbacks
                 .Include(feedback => feedback.Order)
-                .ThenInclude(order => order.RestaurantId)
                 .Where(feedback => feedback.Order.RestaurantId == restaurantId)
                 .ToList();
         }
@@ -38,7 +37,6 @@ public class FeedbackFacade
         {
             return _context.Feedbacks
                 .Include(feedback => feedback.Order)
-                .ThenInclude(order => order.AgentId)
                 .Where(feedback => feedback.Order.AgentId == agentId)
                 .ToList();
         }
