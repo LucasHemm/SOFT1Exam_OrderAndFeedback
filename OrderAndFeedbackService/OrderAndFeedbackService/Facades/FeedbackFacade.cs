@@ -25,9 +25,24 @@ public class FeedbackFacade
             return feedback;
         }
         
+        public List<Feedback> GetFeedbacksByRestaurant(int restaurantId)
+        {
+            return _context.Feedbacks
+                .Include(feedback => feedback.Order)
+                .ThenInclude(order => order.RestaurantId)
+                .Where(feedback => feedback.Order.RestaurantId == restaurantId)
+                .ToList();
+        }
+        
+        public List<Feedback> GetFeedbacksByAgent(int agentId)
+        {
+            return _context.Feedbacks
+                .Include(feedback => feedback.Order)
+                .ThenInclude(order => order.AgentId)
+                .Where(feedback => feedback.Order.AgentId == agentId)
+                .ToList();
+        }
         
         
-        //Get all feedbacks by restaurant by orders
-
-    
+        
 }

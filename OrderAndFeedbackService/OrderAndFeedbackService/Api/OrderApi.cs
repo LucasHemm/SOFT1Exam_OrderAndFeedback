@@ -166,4 +166,18 @@ public class OrderApi : ControllerBase
         }
     }
     
+    //GET api/Order/customer/{customerId}
+    [HttpGet("customer/{customerId}")]
+    public IActionResult GetFinishedOrdersByCustomerId(int customerId)
+    {
+        try
+        {
+            return Ok(_orderFacade.GetFinishedOrdersByCustomerId(customerId).Select(order => new OrderDTO(order)).ToList());
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
 }
