@@ -49,7 +49,7 @@ public class OrderApi : ControllerBase
             OrderDTO updatedOrder = new OrderDTO(_orderFacade.UpdateOrderStatus(orderDto));
             try
             {
-                var response = await _httpClient.GetAsync("http://localhost:5042/api/customerapi/" + updatedOrder.CustomerId);
+                var response = await _httpClient.GetAsync("http://customer_app:8083/api/customerapi/" + updatedOrder.CustomerId);
                 // //from the response, get the user email from the json without using any object, just get the email value
                 var json = await response.Content.ReadAsStringAsync();
                 String email = JObject.Parse(json)["email"].ToString();
