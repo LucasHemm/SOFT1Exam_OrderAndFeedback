@@ -29,5 +29,33 @@ public class FeedbackApi : ControllerBase
         }
     }
     
+    [HttpGet("agent/{agentId}")]
+    public IActionResult GetFeedbacksByAgent(int agentId)
+    {
+        try
+        {
+            var feedbacks = _feedbackFacade.GetFeedbacksByAgent(agentId);
+            return Ok(feedbacks);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [HttpGet("restaurant/{restaurantId}")]
+    public IActionResult GetFeedbacksByRestaurant(int restaurantId)
+    {
+        try
+        {
+            var feedbacks = _feedbackFacade.GetFeedbacksByRestaurant(restaurantId);
+            return Ok(feedbacks);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
     
 }

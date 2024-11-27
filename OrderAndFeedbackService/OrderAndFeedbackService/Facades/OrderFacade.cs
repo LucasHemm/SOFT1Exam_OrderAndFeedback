@@ -89,4 +89,14 @@ public class OrderFacade
             .ToList();
     }
     
+    public List<Order> GetFinishedOrdersByCustomerId(int customerId)
+    {
+        return _context.Orders
+            .Include(order => order.OrderLines)
+            .Where(order => order.CustomerId == customerId && order.Status.ToLower().Equals("delivered"))
+            .ToList();
+    }
+    
+    
+    
 }
