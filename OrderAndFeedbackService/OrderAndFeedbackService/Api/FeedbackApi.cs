@@ -29,7 +29,7 @@ public class FeedbackApi : ControllerBase
         }
     }
     
-    [HttpGet]
+    [HttpGet("agent/{agentId}")]
     public IActionResult GetFeedbacksByAgent(int agentId)
     {
         try
@@ -43,7 +43,7 @@ public class FeedbackApi : ControllerBase
         }
     }
     
-    [HttpGet]
+    [HttpGet("restaurant/{restaurantId}")]
     public IActionResult GetFeedbacksByRestaurant(int restaurantId)
     {
         try
