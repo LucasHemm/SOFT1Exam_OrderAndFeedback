@@ -12,6 +12,7 @@
   - [Tech stack](#tech-stack)
   - [API Documentation](#api-documentation)
     - [Rest](#rest)
+  - [Message broker Documentation](#message-broker-documentation)
     - [RabbitMQ](#rabbitmq)
   - [Docker Compose](#docker-compose)
     - [Overview](#overview)
@@ -20,7 +21,7 @@
 
 ## Introduction
 
-Welcome to the **SOFT1Exam_OrderAndFeedback** repository! This is one of 7 mircoservices for our first semester software PBA exam. This microservice is responsible for managing orders and feedback. This part of the project is the "legacy" part. It's supposed to act as the last parts of the old monolithic system. This microservice functions independently from the other microservices, but it can be used in conjunction with them to create a more complex system.
+Welcome to the **SOFT1Exam_OrderAndFeedback** repository! This is one of 7 mircoservices for our first semester software PBA exam "MTOGO". This microservice is responsible for managing orders and feedback. This part of the project is the "legacy" part. It's supposed to act as the last parts of the old monolithic system. This microservice does not function independently from the other microservices.
 
 For this microservice specifically, it is also required that the **SOFT1Exam_Customer** microservice and **SOFT1Exam_Notification** is running, as it is dependent on them.
 These can be found here
@@ -82,6 +83,7 @@ The tech stack for this microservice is as follows:
 | `GET /api/FeedbackApi/agent/{agentId}`| Get feedbacks by agent                | JSON         |
 | `GET /api/FeedbackApi/restaurant/{restaurantId}`| Get feedbacks by restaurant | JSON         |
 
+## Message broker Documentation
 ### RabbitMQ
 
 | **Queue Name** | **Exchange**    | **Routing Key**      | **Description**                                      | **Message Format** |
