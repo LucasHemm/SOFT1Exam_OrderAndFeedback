@@ -109,6 +109,11 @@ And the grafana UI at:
 http://localhost:3000
 ```
 
+Alternatively, you can run all the services from the MTOGO project by going to this repository and following the guide there.
+```
+https://github.com/LucasHemm/SOFTEXAM_Deployment
+```
+
 ### Dockerhub
 The docker-compose file uses the local dockerfile to build the image, and run the container. The image can also be found on Docker Hub at:
 ```
