@@ -11,6 +11,8 @@
     - [Pipeline Steps](#pipeline-steps)
   - [Tech stack](#tech-stack)
   - [API Documentation](#api-documentation)
+    - [Rest](#rest)
+    - [RabbitMQ](#rabbitmq)
   - [Docker Compose](#docker-compose)
     - [Overview](#overview)
     - [Dockerhub](#dockerhub)
@@ -64,6 +66,7 @@ The tech stack for this microservice is as follows:
 - **Coverlet**: The library used to create code coverage reports.
 
 ## API Documentation
+### Rest
 
 | **Endpoint**                  | **Result**                                    | **Format**   |
 |-------------------------------|-----------------------------------------------|--------------|
@@ -78,6 +81,12 @@ The tech stack for this microservice is as follows:
 | `POST /api/FeedbackApi`       | Creates feedback by order                     | JSON         |
 | `GET /api/FeedbackApi/agent/{agentId}`| Get feedbacks by agent                | JSON         |
 | `GET /api/FeedbackApi/restaurant/{restaurantId}`| Get feedbacks by restaurant | JSON         |
+
+### RabbitMQ
+
+| **Queue Name** | **Exchange**    | **Routing Key**      | **Description**                                      | **Message Format** |
+|----------------|------------------|----------------------|------------------------------------------------------|--------------------|
+| email_queue    | default          | email_queue | Sends message with info for when an order status has been updated, so that an email can be sent to the customer | JSON               |
 
 
 
