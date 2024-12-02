@@ -56,6 +56,7 @@ The tech stack for this microservice is as follows:
 - **C#**: The main programming language for the application.
 - **ASP NET Core 8.0**: The main framework for the application.
 - **Microsoft SQL Server**: The database for the application.
+- **Rabbitmq**: The message broker used for communication between microservices.
 - **Promehteus**: The library used for metrics.
 - **Grafana**: The library used for visualizing the metrics.
 - **Docker**: The containerization tool used to deploy the application.
